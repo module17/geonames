@@ -478,8 +478,8 @@ SET created_at=NOW(),updated_at=null";
             'admin3_code'       => $geonameData[ 12 ],
             'admin4_code'       => $geonameData[ 13 ],
             'population'        => $geonameData[ 14 ],
-            'elevation'         => $geonameData[ 15 ],
-            'dem'               => $geonameData[ 16 ],
+            'elevation'         => (int)$geonameData[ 15 ],
+            'dem'               => (int)$geonameData[ 16 ],
             'timezone'          => $geonameData[ 17 ],
             'modification_date' => $geonameData[ 18 ],
         ];

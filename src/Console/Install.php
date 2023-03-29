@@ -173,6 +173,14 @@ class Install extends Command {
                     $this->info( "geonames:alternate-name COMPLETE" );
                 endif;
 
+                $countryInfoResult = $this->call( 'geonames:country-info', [
+                                                      '--connection' => $this->connectionName ] );
+                if ( $countryInfoResult < 0 ):
+                    $this->error( "Check the log. There was an error running geonames:country-info" );
+                    return $countryInfoResult;
+                else:
+                    $this->info( "geonames:country-info COMPLETE" );
+                endif;
 
                 $geonameResult = $this->call( 'geonames:geoname',
                                               [ '--test'       => TRUE,

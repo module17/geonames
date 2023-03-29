@@ -127,8 +127,8 @@ class FeatureCode extends AbstractCommand {
         }
 
         if ( $allRowsInserted === TRUE ) {
-            Schema::connection( $this->connectionName )->drop( self::TABLE );
-            Schema::connection( $this->connectionName )->rename( self::TABLE_WORKING, self::TABLE );
+            // Schema::connection( $this->connectionName )->drop( self::TABLE );
+            // Schema::connection( $this->connectionName )->rename( self::TABLE_WORKING, self::TABLE );
             $this->info( self::TABLE . " table was truncated and refilled in " . $this->getRunTime() . " seconds." );
         } else {
             Log::error( '', "Failed to insert all of the " . self::TABLE . " rows.", 'database',

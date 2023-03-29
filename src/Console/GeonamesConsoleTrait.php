@@ -88,11 +88,11 @@ trait GeonamesConsoleTrait {
         }
 
         // Check for LOAD DATA permissions.
-        if ( ! isset( $databaseConfigurationArray[ 'options' ] )
-             || !isset($databaseConfigurationArray[ 'options' ][ \PDO::MYSQL_ATTR_LOCAL_INFILE ])
-             || TRUE !== $databaseConfigurationArray[ 'options' ][ \PDO::MYSQL_ATTR_LOCAL_INFILE ] ):
-            throw new Exception( "checkDatabase() failed: Make sure you have this line added to your database connection config in the /config/database.php in your project: 'options' => [\PDO::MYSQL_ATTR_LOCAL_INFILE => true,]" );
-        endif;
+        // if ( ! isset( $databaseConfigurationArray[ 'options' ] )
+        //      || !isset($databaseConfigurationArray[ 'options' ][ \PDO::MYSQL_ATTR_LOCAL_INFILE ])
+        //      || TRUE !== $databaseConfigurationArray[ 'options' ][ \PDO::MYSQL_ATTR_LOCAL_INFILE ] ):
+        //     throw new Exception( "checkDatabase() failed: Make sure you have this line added to your database connection config in the /config/database.php in your project: 'options' => [\PDO::MYSQL_ATTR_LOCAL_INFILE => true,]" );
+        // endif;
 
 
         try {
@@ -339,7 +339,9 @@ trait GeonamesConsoleTrait {
             case 'mysql':
                 $statement = 'CREATE TABLE ' . $workingTableName . ' LIKE ' . $tableName . ';';
                 break;
-
+            case 'pgsql':
+                $statement = 'CREATE TABLE ' . $workingTableName . ' (LIKE ' . $tableName . ' INCLUDING ALL);';
+                break;
             case 'sqlite':
                 $statementToBeModified = DB::connection( $this->connectionName )
                                            ->table( 'sqlite_master' )
