@@ -425,7 +425,9 @@ SET created_at=NOW(),updated_at=null";
 
         while ( ( $line = fgetcsv( $file, 0, "\t" ) ) !== FALSE ) {
             $modifiedLine = $this->formatLineForEloquent( $line );
-            $rows[]       = $modifiedLine;
+            if ($modifiedLine !== false) {
+                $rows[]       = $modifiedLine;
+            }
         }
         fclose( $file );
 
@@ -433,7 +435,7 @@ SET created_at=NOW(),updated_at=null";
         try {
             $chunkedRows = array_chunk( $rows, self::ROWS_TO_INSERT_AT_ONCE );
             $numChunks   = count( $chunkedRows );
-            $this->comment( "Split the insert file into " . $numChunks . " chuncks of " . self::ROWS_TO_INSERT_AT_ONCE . " rows per chunk." );
+            $this->comment( "Split the insert file into " . $numChunks . " chunks of " . self::ROWS_TO_INSERT_AT_ONCE . " rows per chunk." );
             $bar = $this->output->createProgressBar( $numChunks );
             foreach ( $chunkedRows as $rowsToInsert ):
                 \MichaelDrennen\Geonames\Models\GeonameWorking::insert( $rowsToInsert );
@@ -462,6 +464,10 @@ SET created_at=NOW(),updated_at=null";
      */
     protected function formatLineForEloquent( array $geonameData ) {
 
+        // @TODO: Filter out unwanted feature class records
+         if (in_array($geonameData[6], ['A', 'P']) === false) {
+             return false;
+         }
         return [
             'geonameid'         => $geonameData[ 0 ],
             'name'              => $geonameData[ 1 ],

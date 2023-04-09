@@ -92,7 +92,9 @@ class NoCountry extends AbstractCommand {
         }
 
 
-        $this->insertWithLoadDataInfile( $localTextFile );
+        // @TODO: Check which engine is being used
+        //$this->insertWithLoadDataInfile( $localTextFile );
+        $this->insertWithCopyFromFile( $localTextFile );
 
 
         $this->info( "The no-country data was downloaded and inserted in " . $this->getRunTime() . " seconds." );
@@ -157,6 +159,84 @@ SET created_at=NOW(),updated_at=null";
         if ( $rowsInserted === FALSE ) {
             Log::error( '', "Unable to load data infile for no-country.", 'database', $this->connectionName );
             throw new Exception( "Unable to execute the load data infile query. " . print_r( DB::connection( $this->connectionName )
+                                                                                               ->getpdo()->errorInfo(),
+                                                                                             TRUE ) );
+        }
+
+        $this->info( "Inserted text file into: " . InsertGeonames::TABLE );
+
+    }
+
+     /**
+     * @param $localFilePath
+     * 
+     * To support pgsql
+     * 
+     * @throws Exception
+     */
+    protected function insertWithCopyFromFile( $localFilePath ) {
+
+        $this->line( "\nAttempting COPY FROM on " . $localFilePath );
+
+        // Windows patch
+        $localFilePath = $this->fixDirectorySeparatorForWindows( $localFilePath );
+
+        $fields = 'geonameid, 
+        name, 
+        asciiname, 
+        alternatenames, 
+        latitude, 
+        longitude, 
+        feature_class, 
+        feature_code, 
+        country_code, 
+        cc2, 
+        admin1_code, 
+        admin2_code, 
+        admin3_code, 
+        admin4_code, 
+        population, 
+        elevation, 
+        dem, 
+        timezone, 
+        modification_date';
+
+        $query = "COPY " . InsertGeonames::TABLE . " 
+        (geonameid, 
+             name, 
+             asciiname, 
+             alternatenames, 
+             latitude, 
+             longitude, 
+             feature_class, 
+             feature_code, 
+             country_code, 
+             cc2, 
+             admin1_code, 
+             admin2_code, 
+             admin3_code, 
+             admin4_code, 
+             population, 
+             elevation, 
+             dem, 
+             timezone, 
+             modification_date) 
+             FROM '" . $localFilePath . "'";
+             // @TODO: Add support SET created_at=NOW(),updated_at=null
+
+        // $this->line( "Running the COPY FROM query. This could take a good long while." );
+        $rowsInserted = DB::connection( $this->connectionName )->getpdo()->pgsqlCopyFromFile(
+            InsertGeonames::TABLE,
+            $localFilePath,
+            "\t",
+            "\\\\N",
+            $fields
+        );
+
+        //$rowsInserted = DB::connection( $this->connectionName )->getpdo()->exec( $query );
+        if ( $rowsInserted === FALSE ) {
+            Log::error( '', "Unable to copy from file for no-country.", 'database', $this->connectionName );
+            throw new Exception( "Unable to execute the cope from file query. " . print_r( DB::connection( $this->connectionName )
                                                                                                ->getpdo()->errorInfo(),
                                                                                              TRUE ) );
         }

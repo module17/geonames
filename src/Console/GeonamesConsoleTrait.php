@@ -340,7 +340,8 @@ trait GeonamesConsoleTrait {
                 $statement = 'CREATE TABLE ' . $workingTableName . ' LIKE ' . $tableName . ';';
                 break;
             case 'pgsql':
-                $statement = 'CREATE TABLE ' . $workingTableName . ' (LIKE ' . $tableName . ' INCLUDING ALL);';
+               // $statement = 'CREATE TABLE ' . $workingTableName . ' (LIKE ' . $tableName . ' INCLUDING ALL) WITH DATA;';
+                $statement = 'CREATE TABLE ' . $workingTableName . ' AS TABLE ' . $tableName . ' WITH DATA;';
                 break;
             case 'sqlite':
                 $statementToBeModified = DB::connection( $this->connectionName )
